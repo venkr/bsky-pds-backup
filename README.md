@@ -9,10 +9,12 @@ The gist of this is to `tar` and copy the contents of the `/pds` folder to an S3
 ## When to use this?
 
 This isn't the greatest solution, and has some drawbacks we'll get to in a bit.
-If you're using a VPS provider that you: a) trust, b) has backups built in - you should just use that! For reasons we'll discuss later, disk snapshots are very reliable.
+If you're using a VPS provider that you: a) trust, b) has backups built in - you should just use that! 
 
 The main reasons to use this are:
+
 a) You're using a VPS provider that you don't entirely trust. For example, Oracle Cloud has a generous free tier, and built-in backups, but there are some reports online of accounts being closed (including making it impossible to access backups either)
+
 b) You're using a Raspberry Pi or some other homebrew server, and don't have disk snapshotting available to you.
 
 ## Quick set-up
@@ -59,9 +61,11 @@ The /pds/ folder does contain all the data though: so you should just a) initial
 ## Caveats & better approaches
 
 This approach is pretty naive: it just tars up the entire /pds/ folder. 
-In theory, this is not safe - if you get unlucky to copy over a `.sqlite` file and a `.sqlite-wal` file in the wrong order, you could end up with database corruption. [Read more here.](https://www.sqlite.org/howtocorrupt.html)
+In theory, this is not safe - if you get unlucky to copy over a `.sqlite` file and a `.sqlite-wal` file at different times during a transaction, you could end up with database corruption. [Read more here.](https://www.sqlite.org/howtocorrupt.html)
 
-In practice: I've tested all SQLite databases in a few backups I've made of a PDS with ~20 user accounts, and they've all been perfectly fine. You can also validate the integrity of a backup by downloading a backup, untarring it, and running the validate.sh on the resulting /pds/ folder.
+On the other hand: VPS provider disk snapshots happen at a single point in time, and are usually equivalent to a power outage, hence they're usually safe with SQLite + cannot corrupt the database.
+
+In practice: I've tested all SQLite databases in a few backups I've made of a PDS with ~20 user accounts, and they've all been perfectly fine. You can also validate the integrity of a backup you make by downloading a backup, untarring it, and running the validate.sh on the resulting /pds/ folder.
 
 However, as your PDS scales, this may become more error prone, here's some notes about better steps:
 - The included script has a "safe" mode - which stops the PDS server before copying over the files, which should guarantee no SQLite corruption. However: this makes your server unavailable for a couple of seconds, which is undesirable.
