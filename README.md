@@ -65,9 +65,9 @@ In theory, this is not safe - if you get unlucky to copy over a `.sqlite` file a
 
 On the other hand: VPS provider disk snapshots happen at a single point in time, and are usually equivalent to a power outage, hence they're usually safe with SQLite + cannot corrupt the database.
 
-In practice: I've tested all SQLite databases in a few backups I've made of a PDS with ~20 user accounts, and they've all been perfectly fine. You can also validate the integrity of a backup you make by downloading a backup, untarring it, and running the validate.sh on the resulting /pds/ folder.
+In practice: I've tested all SQLite databases in a few backups I've made of a PDS with ~20 user accounts, and they've all been perfectly fine. You can also validate the integrity of all databases within a backup by downloading it, untarring it, and running the validate.sh on the resulting /pds/ folder.
 
-However, as your PDS scales, this may become more error prone, here's some notes about better steps:
+However, as your PDS scales, this may become more of a concern, here's some notes about better steps:
 - The included script has a "safe" mode - which stops the PDS server before copying over the files, which should guarantee no SQLite corruption. However: this makes your server unavailable for a couple of seconds, which is undesirable.
-- Using SQLite's built-in backup tools is on the roadmap, it's a little annoying since you have to do it recursively, and it's slower, but you'd call `sudo sqlite3 /pds/{dir}/store.sqlite "VACUUM INTO '/home/ubuntu/backup/pds/{dir}/store.sqlite';"` for each database.
+- Using SQLite's built-in backup tools is the right solution here, it's a little annoying since you have to do it recursively, and it's slower, but you'd need to recursively call `sudo sqlite3 /pds/{dir}/store.sqlite "VACUUM INTO '/home/ubuntu/backup/pds/{dir}/store.sqlite';"` for each database, while calling a regular `cp` on all non-sqlite files.
 
