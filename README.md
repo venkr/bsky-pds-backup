@@ -54,9 +54,26 @@ and then add something like (for a nightly backup):
 
 ## Restoring your backup
 
-TODO: I've not 100% tested this flow yet, ie: how do you set up a new PDS server without creating a new /pds/ folder.
+- Download you backup file, and copy it onto your server.
 
-The /pds/ folder does contain all the data though: so you should just a) initialize a brand new PDS server, b) replace the /pds/ folder with the one from your backup.
+- Stop your PDS and save a copy of your old PDS data if it still exists:
+```
+sudo docker stop pds
+sudo mv /pds /pds-old
+```
+
+- Untar your pds data backup and move it over
+```
+tar -xf <your-backup-filename>.tar
+mv pds /pds
+```
+
+- Start your PDS
+```
+sudo docker stop pds
+```
+
+Note: I've not tested this flow when moving to a new server, only replacing my existing PDS data with a backup. Please let me know if you find anything different when testing that out.
 
 ## Caveats & better approaches
 
